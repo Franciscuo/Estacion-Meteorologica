@@ -10,7 +10,8 @@ const unsigned char Humedad[17]	= {"HUMEDAD:	   %"};
 const unsigned char lluvia[17]	= {"LLUVIA: 	    "};
 const unsigned char Viento1[17]	= {"VELOCIDAD DE    "};
 const unsigned char Viento2[17]	= {"VIENTO:     KM/H"};
-
+char cont = 0;
+int aux=0,temp=0,hume=0,velo=0,pre=0,lluvi=0;
 //----------RUTINAS LCD-----------------------
 //--------------------------------------------
 
@@ -81,6 +82,8 @@ void	act_msj(char m){
 	}
 		
 }
+
+
 //-------------------FIN LCD------------
 void main(void) {
 	//---------------Configuración del microcontrolador-------------
@@ -93,13 +96,17 @@ void main(void) {
 	LRESET=1;
 	tiempo(5000);
 	LRESET=0;
+	//-------Configuracion ADC--------------
+	ADCCFG=0b01001000;//selecciona modo de operacion(2-3) 10 bit , fuente de reloj bus, configuracion de tiempo de muestreo corto, rapido
+	APCTL1=0b00011111; // Habilita pines B0-B5
+	ADCSC1=0b00001111;// Conversion desabilitada, deshabilitado conversion continua, interupcion desabilitada, Coco
+	//--------------------------------------------------------
 	//-------Configuracion LCD---------------
 	//--------------------------------------------------------
-		PTEDD=0xFF;//Configura salidas Para LCD
+		PTEDD=0XFF;//Configura salidas Para LCD
 		tiempo(50000);
 		//PTGPE=0XFF;
-		PTEDD=0XFF;
-		PTDDD=3;
+		PTDDD=3;//CONFIGURA SALIDAS R-W
 		PTDD_PTDD1=0;
 		PTED=0b00111000;
 		comando();
@@ -114,7 +121,7 @@ void main(void) {
 	//------------------------------------------------------------	
 		//---------Configuracion Timer 1-----------
 		TPM2SC = 0b01000111;
-		TPM2MOD = 62500;
+		TPM2MOD = 62000;//Para 1 segundo
 		TPM2SC_CLKSA = 1;	 //Habilita Timer 2
 		EnableInterrupts;
   for(;;) {
@@ -124,7 +131,40 @@ void main(void) {
  
 interrupt VectorNumber_Vtpm2ovf void TPM2_ISR(void){
   	TPM2SC_TOF=0;
+  	if(cont==0){
+  		ADCSC1=0b0000000;//Inicia conversion con canal 0- Temperatura
+  		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
+  		aux=ADCR;//Lee dato de la conversion
+  		temp=(5*aux)/1023;//conversiones
+  		
+  		ADCSC1=0b0000001;//Inicia conversion con canal 1- Humedad
+  		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
+  		aux=ADCR;//Lee dato de la conversion
+  		hume=(5*aux)/1023;//conversiones
+  		cont=1;
+  	}
+  	if(cont==1){
+  		ADCSC1=0b0000010;//Inicia conversion con canal 2- presion
+  		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
+  		aux=ADCR;//Lee dato de la conversion
+  		pre=(5*aux)/1023;//conversiones
+  		  		
+  		ADCSC1=0b0000011;//Inicia conversion con canal 3- cantidad de lluvia
+  		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
+  		aux=ADCR;//Lee dato de la conversion
+  		lluvi=(5*aux)/1023;//conversiones
+   		cont=2;
+  	}
+  	if(cont==2){
+  		ADCSC1=0b0000100;//Inicia conversion con canal 4- cantidad de lluvia
+  		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
+  		aux=ADCR;//Lee dato de la conversion
+  		velo=(5*aux)/1023;//conversiones
+  		cont=0;
+  	}
+  	act_msj(cont);
   }
   
   
+
 

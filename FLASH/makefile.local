@@ -6,6 +6,6 @@
 
 export HC08ToolsEnv=$(CWInstallLocationEnv)/MCU/prog
 export GNU_Make_Install_DirEnv=$(CWInstallLocationEnv)/gnu/bin
-export ProjDirPath=C:/Users/Frank/Desktop/MicroControladores/Laboratorios/Estacion Meteorologica
-export CWInstallLocationEnv=C:/Freescale/CW MCU v11.0
+export ProjDirPath=C:/Users/Nicolas Zamora/Documents/workspace/Estacion-Meteorologica
+export CWInstallLocationEnv=C:/Freescale/CW MCU v10.7
 export MCUToolsBaseDirEnv=$(CWInstallLocationEnv)/MCU
