@@ -4,14 +4,15 @@
 #define LRESET	PTCD_PTCD2
 
 unsigned int i,j;//VARIABLES PARA QUE FUNCIONEN LAS SURUTINAS
-const unsigned char Temperatura[17]={"TEMPERATURA:  C°"};
+const unsigned char Temperatura[17]={"TEMPERATURA:  C "};
 const unsigned char Presion[17]	= {"PRESION:     KPA"};
-const unsigned char Humedad[17]	= {"HUMEDAD:	   %"};
-const unsigned char lluvia[17]	= {"LLUVIA: 	    "};
+const unsigned char Humedad[17]	= {"HUMEDAD:       %"};
+const unsigned char lluvia[17]	= {"LLUVIA:         "};
 const unsigned char Viento1[17]	= {"VELOCIDAD DE    "};
 const unsigned char Viento2[17]	= {"VIENTO:     KM/H"};
-char cont = 0;
-int aux=0,temp=0,hume=0,velo=0,pre=0,lluvi=0;
+volatile unsigned char cont = 0;
+volatile unsigned long temp=0;
+volatile unsigned int aux=0,hume=0,velo=0,pre=0,lluvi=0;
 //----------RUTINAS LCD-----------------------
 //--------------------------------------------
 
@@ -43,20 +44,38 @@ void dato(){
 	return;
 }
 
-void	act_msj(char m){
-	if(m==0){
+void act_dato1(unsigned long help){
+	unsigned int Cperiodo=0, Dperiodo=0, Uperiodo=0, Aux1=0, Aux=0; 
+	Cperiodo=help/100;
+	Aux1=Aux-Cperiodo*100;
+	Dperiodo=Aux1/10;
+	Uperiodo=Aux1%10;
+	cursor(0b10001100);
+	PTED=Cperiodo+0x30;
+	dato();
+	cursor(0b10001101);
+	PTED=Dperiodo+0x30;
+	dato();
+	cursor(0b10001110);
+	PTED=Uperiodo+0x30;
+	dato(); 
+	return;
+	
+}
+void	act_msj(){
+	if(cont==0){
 		cursor(0b10000000);
 		for(j=0;j<sizeof(Temperatura)-1;j++){
 			PTED=Temperatura[j];
 			dato();
-		}
+		}		
 		cursor(0b11000000);
 		for(j=0;j<sizeof(Humedad)-1;j++){
 			PTED=Humedad[j];
 			dato();
 		}
 	}
-	if(m==1){
+	else if(cont==1){
 		cursor(0b10000000);
 		for(j=0;j<sizeof(Presion)-1;j++){
 			PTED=Presion[j];
@@ -67,8 +86,7 @@ void	act_msj(char m){
 			PTED=lluvia[j];
 			dato();
 		}
-	}
-	if(m==2){
+	}else{
 		cursor(0b10000000);
 		for(j=0;j<sizeof(Viento1)-1;j++){
 			PTED=Viento1[j];
@@ -117,11 +135,10 @@ void main(void) {
 		PTED=0b00000001;
 		comando();
 		tiempo(20000);
-		act_msj(0);
 	//------------------------------------------------------------	
 		//---------Configuracion Timer 1-----------
 		TPM2SC = 0b01000111;
-		TPM2MOD = 62000;//Para 1 segundo
+		TPM2MOD = 62500;//Para 1 segundo
 		TPM2SC_CLKSA = 1;	 //Habilita Timer 2
 		EnableInterrupts;
   for(;;) {
@@ -136,33 +153,33 @@ interrupt VectorNumber_Vtpm2ovf void TPM2_ISR(void){
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
   		temp=(5*aux)/1023;//conversiones
-  		
   		ADCSC1=0b0000001;//Inicia conversion con canal 1- Humedad
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
   		hume=(5*aux)/1023;//conversiones
-  		cont=1;
+  		act_msj();
+  		cont=cont+1;
   	}
-  	if(cont==1){
+  	else if(cont==1){
   		ADCSC1=0b0000010;//Inicia conversion con canal 2- presion
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
   		pre=(5*aux)/1023;//conversiones
-  		  		
   		ADCSC1=0b0000011;//Inicia conversion con canal 3- cantidad de lluvia
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
   		lluvi=(5*aux)/1023;//conversiones
-   		cont=2;
+  		act_msj();
+  		cont=cont+1;
   	}
-  	if(cont==2){
+  	else{
   		ADCSC1=0b0000100;//Inicia conversion con canal 4- cantidad de lluvia
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
   		velo=(5*aux)/1023;//conversiones
+  		act_msj();
   		cont=0;
   	}
-  	act_msj(cont);
   }
   
   
