@@ -25,7 +25,7 @@ _startupData is allocated at 0xC084 and uses 6 Bytes
 extern struct _tagStartup {
   unsigned nofZeroOut     1
   _Range   pZeroOut       0x100     19
-  _Copy    *toCopyDownBeg 0xC35E
+  _Copy    *toCopyDownBeg 0xC3F2
 } _startupData;
 
 *********************************************************************************************
@@ -35,8 +35,8 @@ Section Name                    Size  Type     From       To       Segment
 .init                            132     R     0xC000     0xC083   ROM
 .startData                        18     R     0xC084     0xC095   ROM
 .rodata                          102     R     0xC096     0xC0FB   ROM
-.text                            610     R     0xC0FC     0xC35D   ROM
-.copy                              2     R     0xC35E     0xC35F   ROM
+.text                            758     R     0xC0FC     0xC3F1   ROM
+.copy                              2     R     0xC3F2     0xC3F3   ROM
 .abs_section_ffda                  2     R     0xFFDA     0xFFDB   .absSeg0
 .abs_section_0                     1   N/I        0x0        0x0   .absSeg1
 .abs_section_1                     1   N/I        0x1        0x1   .absSeg2
@@ -188,7 +188,7 @@ Section Name                    Size  Type     From       To       Segment
 .vectSeg145_vect                   2     R     0xFFFE     0xFFFF   .vectSeg145
 
 Summary of section sizes per section type:
-READ_ONLY (R):         364 (dec:      868)
+READ_ONLY (R):         3F8 (dec:     1016)
 READ_WRITE (R/W):       93 (dec:      147)
 NO_INIT (N/I):          A6 (dec:      166)
 
@@ -207,11 +207,12 @@ MODULE:                 -- main_c.obj --
      tiempo                                    C0FC      1C      28       4   .text       
      salto                                     C118      1E      30       2   .text       
      comando                                   C136       4       4       5   .text       
-     cursor                                    C13A       4       4       1   .text       
-     dato                                      C13E       4       4       1   .text       
-     act_msj                                   C142      AA     170       7   .text       
-     main                                      C1EC      5C      92       1   .text       
-     TPM2_ISR                                  C248      79     121       1   .text       
+     cursor                                    C13A       4       4       3   .text       
+     dato                                      C13E       4       4       3   .text       
+     act_dato                                  C142      53      83       2   .text       
+     act_msj                                   C195      C9     201       7   .text       
+     main                                      C25E      5C      92       1   .text       
+     TPM2_ISR                                  C2BA      8B     139       1   .text       
 - VARIABLES:
      Temperatura                               C096      11      17       1   .rodata     
      Presion                                   C0A7      11      17       1   .rodata     
@@ -220,9 +221,9 @@ MODULE:                 -- main_c.obj --
      Viento1                                   C0DA      11      17       1   .rodata     
      Viento2                                   C0EB      11      17       1   .rodata     
      cont                                       100       1       1       6   .bss        
-     temp                                       101       4       4       2   .bss        
+     temp                                       101       4       4       4   .bss        
      aux                                        105       2       2       2   .bss        
-     hume                                       107       2       2       1   .bss        
+     hume                                       107       2       2       2   .bss        
      velo                                       109       2       2       1   .bss        
      pre                                        10B       2       2       1   .bss        
      lluvi                                      10D       2       2       1   .bss        
@@ -249,7 +250,7 @@ MODULE:                 -- mc9s08jm16_c.obj --
      _PTCDD                                       5       1       1       1   .abs_section_5
      _PTDD                                        6       1       1       5   .abs_section_6
      _PTDDD                                       7       1       1       1   .abs_section_7
-     _PTED                                        8       1       1       6   .abs_section_8
+     _PTED                                        8       1       1       8   .abs_section_8
      _PTEDD                                       9       1       1       1   .abs_section_9
      _PTFD                                        A       1       1       0   .abs_section_a
      _PTFDD                                       B       1       1       0   .abs_section_b
@@ -387,27 +388,28 @@ MODULE:                 -- mc9s08jm16_c.obj --
      _DBGF                                     1814       2       2       0   .abs_section_1814
 MODULE:                 -- rtshc08.o (ansiis.lib) --
 - PROCEDURES:
-     _IDIVMOD                                  C2C1      69     105       1   .text       
-     _IMUL_STAR08                              C32A      27      39       1   .text       
-     _IDIVU_STAR08                             C351       D      13       1   .text       
+     _IDIVMOD                                  C345      69     105       2   .text       
+     _IMUL_STAR08                              C3AE      27      39       2   .text       
+     _IDIVU_STAR08                             C3D5       D      13       2   .text       
+     _IMODU_STAR08                             C3E2      10      16       2   .text       
 - VARIABLES:
 
 *********************************************************************************************
 MODULE STATISTIC
   Name                                      Data   Code  Const
 ---------------------------------------------------------------------------------------------
-  main_c.obj                                  19    453    104
+  main_c.obj                                  19    585    104
   start08_c.obj                                0    132      0
   mc9s08jm16_c.obj                           166      0      0
-  rtshc08.o (ansiis.lib)                       0    157      0
+  rtshc08.o (ansiis.lib)                       0    173      0
   other                                      128     20      2
 
 *********************************************************************************************
 SECTION USE IN OBJECT-ALLOCATION SECTION
 ---------------------------------------------------------------------------------------------
 SECTION: ".text"
-  tiempo salto comando cursor dato act_msj main TPM2_ISR _IDIVMOD _IMUL_STAR08 
-  _IDIVU_STAR08 
+  tiempo salto comando cursor dato act_dato act_msj main TPM2_ISR _IDIVMOD 
+  _IMUL_STAR08 _IDIVU_STAR08 _IMODU_STAR08 
 SECTION: ".bss"
   cont temp aux hume velo pre lluvi 
 SECTION: ".init"
@@ -719,7 +721,7 @@ OBJECT LIST SORTED BY ADDRESS
      _PTCDD                                       5       1       1       1   .abs_section_5
      _PTDD                                        6       1       1       5   .abs_section_6
      _PTDDD                                       7       1       1       1   .abs_section_7
-     _PTED                                        8       1       1       6   .abs_section_8
+     _PTED                                        8       1       1       8   .abs_section_8
      _PTEDD                                       9       1       1       1   .abs_section_9
      _PTFD                                        A       1       1       0   .abs_section_a
      _PTFDD                                       B       1       1       0   .abs_section_b
@@ -816,9 +818,9 @@ OBJECT LIST SORTED BY ADDRESS
      _EPCTL5                                     A2       1       1       0   .abs_section_a2
      _EPCTL6                                     A3       1       1       0   .abs_section_a3
      cont                                       100       1       1       6   .bss        
-     temp                                       101       4       4       2   .bss        
+     temp                                       101       4       4       4   .bss        
      aux                                        105       2       2       2   .bss        
-     hume                                       107       2       2       1   .bss        
+     hume                                       107       2       2       2   .bss        
      velo                                       109       2       2       1   .bss        
      pre                                        10B       2       2       1   .bss        
      lluvi                                      10D       2       2       1   .bss        
@@ -876,22 +878,22 @@ OBJECT LIST SORTED BY ADDRESS
      tiempo                                    C0FC      1C      28       4   .text       
      salto                                     C118      1E      30       2   .text       
      comando                                   C136       4       4       5   .text       
-     cursor                                    C13A       4       4       1   .text       
-     dato                                      C13E       4       4       1   .text       
-     act_msj                                   C142      AA     170       7   .text       
-     main                                      C1EC      5C      92       1   .text       
-     TPM2_ISR                                  C248      79     121       1   .text       
-     _IDIVMOD                                  C2C1      69     105       1   .text       
-     _IMUL_STAR08                              C32A      27      39       1   .text       
-     _IDIVU_STAR08                             C351       D      13       1   .text       
+     cursor                                    C13A       4       4       3   .text       
+     dato                                      C13E       4       4       3   .text       
+     act_dato                                  C142      53      83       2   .text       
+     act_msj                                   C195      C9     201       7   .text       
+     main                                      C25E      5C      92       1   .text       
+     TPM2_ISR                                  C2BA      8B     139       1   .text       
+     _IDIVMOD                                  C345      69     105       2   .text       
+     _IMUL_STAR08                              C3AE      27      39       2   .text       
+     _IDIVU_STAR08                             C3D5       D      13       2   .text       
+     _IMODU_STAR08                             C3E2      10      16       2   .text       
      _Vector_18                                FFDA       2       2       0   .abs_section_ffda
 
 *********************************************************************************************
 UNUSED-OBJECTS SECTION
 ---------------------------------------------------------------------------------------------
 NOT USED PROCEDURES
-main_c.obj:
-  act_dato1 
 rtshc08.o (ansiis.lib):
   _PUSH_ARGS_L _PUSH_ARGS_D _ENTER_UNARY_L _ENTER_UNARY_L64 _ENTER_UNARY_L64_4 
   _ENTER_BINARY_L _ENTER_BINARY_L_RC _ENTER_BINARY_L_LC _ENTER_BINARY_L64 
@@ -900,11 +902,11 @@ rtshc08.o (ansiis.lib):
   _LOR_k_is_k_or_j _LXOR_k_is_k_xor_j _LMUL_k_is_k_mul_j _LDIVMOD _NEG_L_HX 
   _ABS_L_HX _SPLITSIGN_L _LMODU_k_is_k_mod_j _LDIVU_k_is_k_div_j 
   _LMODS_k_is_k_mod_j _LDIVS_k_is_k_div_j _LCMP_k_rel_j _CMP24_k_rel_j _BMULS 
-  _BDIVS _BMODS _IDIVS_STAR08 _IMODS_STAR08 _IMODU_STAR08 _IDIVU_8 _IMODU_8 
-  _IASR _ILSR _ILSL _ICMP _LINC _LDEC _LNEG _LNOT _LADD _LADD_RC _LSUB _LSUB_LC 
-  _LSUB_RC _LAND _LAND_RC _LOR _LOR_RC _LXOR _LXOR_RC _LMUL _LMUL_RC _LDIVS 
-  _LDIVS_LC _LDIVS_RC _LDIVU _LDIVU_LC _LDIVU_RC _LMODS _LMODS_LC _LMODS_RC 
-  _LMODU _LMODU_LC _LMODU_RC _LASR _LLSR _LLSL _LCMP _LCMP_RC _PUSH_ARGS_24 
+  _BDIVS _BMODS _IDIVS_STAR08 _IMODS_STAR08 _IDIVU_8 _IMODU_8 _IASR _ILSR _ILSL 
+  _ICMP _LINC _LDEC _LNEG _LNOT _LADD _LADD_RC _LSUB _LSUB_LC _LSUB_RC _LAND 
+  _LAND_RC _LOR _LOR_RC _LXOR _LXOR_RC _LMUL _LMUL_RC _LDIVS _LDIVS_LC 
+  _LDIVS_RC _LDIVU _LDIVU_LC _LDIVU_RC _LMODS _LMODS_LC _LMODS_RC _LMODU 
+  _LMODU_LC _LMODU_RC _LASR _LLSR _LLSL _LCMP _LCMP_RC _PUSH_ARGS_24 
   _ENTER_BINARY_24_RC _ENTER_BINARY_24 _CMP24 _CMP24_RC _COPY _COPY_L _POP32 
   _POP64 _STORE32 _STORE64 _SEXT8_32 _SEXT16_32 _CALL_STAR08 _CALL_STAR08_FAR 
   _Jump_Table_Addr _Jump_Table_Offset _Jump_Table_Header_Addr 
@@ -918,7 +920,7 @@ rtshc08.o (ansiis.lib):
 *********************************************************************************************
 COPYDOWN SECTION
 ---------------------------------------------------------------------------------------------
-------- ROM-ADDRESS: 0xC35E ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xC3F2 ---- SIZE       2 ---
 Filling bytes inserted
  0000
 
@@ -932,14 +934,17 @@ salto                     USES _PTDD i tiempo
 comando                   USES _PTDD salto 
 cursor                    USES _PTED comando 
 dato                      USES _PTDD salto 
-act_msj                   USES cont act_msj Temperatura Humedad Presion lluvia 
-                                Viento1 Viento2 cursor j _PTED dato 
+act_dato                  USES _IMODU_STAR08 _IDIVU_STAR08 cursor _PTED dato 
+act_msj                   USES cont act_msj Temperatura temp act_dato Humedad 
+                                hume Presion lluvia Viento1 Viento2 cursor j _PTED 
+                                dato 
 main                      USES _SOPT1 _MCGTRM _MCGC1 _MCGSC _PTCDD _PTCD 
                                 tiempo _ADCCFG _APCTL1 _ADCSC1 _PTEDD _PTDDD _PTDD 
                                 _PTED comando _TPM2SC _TPM2MOD 
-TPM2_ISR                  USES _TPM2SC cont _ADCSC1 temp hume pre lluvi 
-                                act_msj velo _ADCR aux _IMUL_STAR08 _IDIVU_STAR08 
+TPM2_ISR                  USES _TPM2SC cont _ADCSC1 _IMUL_STAR08 temp hume pre 
+                                lluvi act_msj velo _IDIVU_STAR08 _ADCR aux 
 _IDIVU_STAR08             USES _IDIVMOD 
+_IMODU_STAR08             USES _IDIVMOD 
 _Vector_18                USES TPM2_ISR 
 
 *********************************************************************************************
@@ -969,22 +974,34 @@ DEPENDENCY TREE
  | 
  +- TPM2_ISR            
     | 
-    +- act_msj             
-    |  | 
-    |  +- cursor              
-    |  |  | 
-    |  |  +- comando              (see above)
-    |  |     
-    |  +- dato                
-    |     | 
-    |     +- salto                (see above)
-    |        
     +- _IMUL_STAR08        
     |    
-    +- _IDIVU_STAR08       
-       | 
-       +- _IDIVMOD            
-            
+    +- act_msj             
+    |  | 
+    |  +- act_dato            
+    |  |  | 
+    |  |  +- _IMODU_STAR08       
+    |  |  |  | 
+    |  |  |  +- _IDIVMOD            
+    |  |  |       
+    |  |  +- _IDIVU_STAR08       
+    |  |  |  | 
+    |  |  |  +- _IDIVMOD             (see above)
+    |  |  |     
+    |  |  +- cursor              
+    |  |  |  | 
+    |  |  |  +- comando              (see above)
+    |  |  |     
+    |  |  +- dato                
+    |  |     | 
+    |  |     +- salto                (see above)
+    |  |        
+    |  +- cursor               (see above)
+    |  |  
+    |  +- dato                 (see above)
+    |     
+    +- _IDIVU_STAR08        (see above)
+       
 *********************************************************************************************
 STATISTIC SECTION
 ---------------------------------------------------------------------------------------------
@@ -992,5 +1009,5 @@ STATISTIC SECTION
 ExeFile:
 --------
 Number of blocks to be downloaded: 6
-Total size of all blocks to be downloaded: 868
+Total size of all blocks to be downloaded: 1016
 

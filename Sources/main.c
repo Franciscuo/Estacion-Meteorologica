@@ -4,12 +4,12 @@
 #define LRESET	PTCD_PTCD2
 
 unsigned int i,j;//VARIABLES PARA QUE FUNCIONEN LAS SURUTINAS
-const unsigned char Temperatura[17]={"TEMPERATURA:  C "};
-const unsigned char Presion[17]	= {"PRESION:     KPA"};
-const unsigned char Humedad[17]	= {"HUMEDAD:       %"};
-const unsigned char lluvia[17]	= {"LLUVIA:         "};
-const unsigned char Viento1[17]	= {"VELOCIDAD DE    "};
-const unsigned char Viento2[17]	= {"VIENTO:     KM/H"};
+const unsigned char Temperatura[17]={"TEMPERATURA:   C"};
+const unsigned char Presion[17]	= 	{"PRESION:     KPA"};
+const unsigned char Humedad[17]	= 	{"HUMEDAD:       %"};
+const unsigned char lluvia[17]	= 	{"LLUVIA:         "};
+const unsigned char Viento1[17]	= 	{"VELOCIDAD DE    "};
+const unsigned char Viento2[17]	= 	{"VIENTO:     KM/H"};
 volatile unsigned char cont = 0;
 volatile unsigned long temp=0;
 volatile unsigned int aux=0,hume=0,velo=0,pre=0,lluvi=0;
@@ -44,23 +44,22 @@ void dato(){
 	return;
 }
 
-void act_dato1(unsigned long help){
-	unsigned int Cperiodo=0, Dperiodo=0, Uperiodo=0, Aux1=0, Aux=0; 
-	Cperiodo=help/100;
-	Aux1=Aux-Cperiodo*100;
-	Dperiodo=Aux1/10;
-	Uperiodo=Aux1%10;
-	cursor(0b10001100);
-	PTED=Cperiodo+0x30;
+void act_dato(unsigned long help,unsigned char punto){
+	unsigned int Chelp=0, Dhelp=0, Uhelp=0, vtemp=0; 
+	Chelp=(unsigned int)help/100;
+	vtemp=(unsigned int)help%100;
+	Dhelp=vtemp/10;
+	Uhelp=vtemp%10;
+	//cursor(punto);
+	//PTED=Chelp+0x30;
+	//dato();
+	cursor(punto+1);
+	PTED=Dhelp+0x30;
 	dato();
-	cursor(0b10001101);
-	PTED=Dperiodo+0x30;
-	dato();
-	cursor(0b10001110);
-	PTED=Uperiodo+0x30;
+	cursor(punto+2);
+	PTED=Uhelp+0x30;
 	dato(); 
 	return;
-	
 }
 void	act_msj(){
 	if(cont==0){
@@ -68,12 +67,14 @@ void	act_msj(){
 		for(j=0;j<sizeof(Temperatura)-1;j++){
 			PTED=Temperatura[j];
 			dato();
-		}		
+		}
+		act_dato(temp,0b10001100);
 		cursor(0b11000000);
 		for(j=0;j<sizeof(Humedad)-1;j++){
 			PTED=Humedad[j];
 			dato();
 		}
+		act_dato(hume,0b11001100);
 	}
 	else if(cont==1){
 		cursor(0b10000000);
@@ -138,7 +139,7 @@ void main(void) {
 	//------------------------------------------------------------	
 		//---------Configuracion Timer 1-----------
 		TPM2SC = 0b01000111;
-		TPM2MOD = 62500;//Para 1 segundo
+		TPM2MOD = 64500;//Para 1 segundo
 		TPM2SC_CLKSA = 1;	 //Habilita Timer 2
 		EnableInterrupts;
   for(;;) {
@@ -152,11 +153,11 @@ interrupt VectorNumber_Vtpm2ovf void TPM2_ISR(void){
   		ADCSC1=0b0000000;//Inicia conversion con canal 0- Temperatura
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
-  		temp=(5*aux)/1023;//conversiones
+  		temp=(50*aux)/1023;//conversiones
   		ADCSC1=0b0000001;//Inicia conversion con canal 1- Humedad
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
-  		hume=(5*aux)/1023;//conversiones
+  		hume=(500*aux)/1023;//conversiones
   		act_msj();
   		cont=cont+1;
   	}
@@ -164,11 +165,11 @@ interrupt VectorNumber_Vtpm2ovf void TPM2_ISR(void){
   		ADCSC1=0b0000010;//Inicia conversion con canal 2- presion
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
-  		pre=(5*aux)/1023;//conversiones
+  		pre=(500*aux)/1023;//conversiones
   		ADCSC1=0b0000011;//Inicia conversion con canal 3- cantidad de lluvia
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
-  		lluvi=(5*aux)/1023;//conversiones
+  		lluvi=(500*aux)/1023;//conversiones
   		act_msj();
   		cont=cont+1;
   	}
@@ -176,7 +177,7 @@ interrupt VectorNumber_Vtpm2ovf void TPM2_ISR(void){
   		ADCSC1=0b0000100;//Inicia conversion con canal 4- cantidad de lluvia
   		while(ADCSC1_COCO==0);//Pregunta si ya finalizo la conversion, NO SE ACTUALIZA BIT POR QE DESPUES SE SOBRE ESCRIBE
   		aux=ADCR;//Lee dato de la conversion
-  		velo=(5*aux)/1023;//conversiones
+  		velo=(500*aux)/1023;//conversiones
   		act_msj();
   		cont=0;
   	}
